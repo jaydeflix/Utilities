@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Codevoid Utilities by grork</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Codevoid Utilities</h1>
+        <p>Stuff to help you do more stuff</p>
+        <p class="view"><a href="https://github.com/grork/Utilities">View the Project on GitHub <small>grork/Utilities</small></a></p>
+        <ul>
+          <li><a href="https://github.com/grork/Utilities/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/grork/Utilities/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/grork/Utilities">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>Utilities</h1>
+
+<p>This is a set of classes designed for use in Windows 8 WWAs using the WinJS frameworks.</p>
+
+<p>There are a number of parts to this:</p>
+
+<h2>Shared Utilities</h2>
+
+<p>These are some common utility functions that allow you to write better code across the board.</p>
+
+<h3>appassert, alert</h3>
+
+<p>Because WWA's don't have an <code>alert</code> function, and instead have <code>Windows.UI.Popup.MessageBox</code>, there is a convenient replacement that looks like your mothers alert, but is async (since sync message boxes aren't possible in WWAs). Just call <code>alert</code> and all will be good.</p>
+
+<p>Additionally, theres a basic assert through <code>appassert</code>, (named so as not to conflict with QUnit's assert class). This is like like a normal <code>assert</code>:
+<code>appassert(condition, message)</code></p>
+
+<p>If condition is not truthy, the previously mentioned <code>alert</code> is used to show a message to the consumer. If a debugger is attached, then the debugger will immediately break at this point too.</p>
+
+<h3>Signal</h3>
+
+<p>WinJS introduces a powerful async parttern through Promises. However, sometimes, creating promises to perform &amp; share promise patterns for your own async code is hard:</p>
+
+<pre><code>var complete, error, progress;    
+var promise = new WinJS.Promise(function(c, e, p) {    
+    complete = c; error = e; progress = progress;    
+});
+</code></pre>
+
+<p>And thats before you start sharing them around and raising the completion etc at the correct times.</p>
+
+<p>Using Codevoid.Utilities.Signal, this is a lot easier:</p>
+
+<pre><code>var signal = new Codevoid.Utilities.Signal();
+signal.complete();
+return signal.promise;
+</code></pre>
+
+<h2>OAuth Helper</h2>
+
+<p>Writing OAuth requests is a pain in the behind. While Windows 8 provides a <a href="http://msdn.microsoft.com/en-us/library/windows/apps/windows.security.authentication.web.aspx">basic</a> way to obtain the secret tokens from the web flow, it doesn't actually make it easy to sign the requests etc. While the <a href="http://code.msdn.microsoft.com/windowsapps/Web-Authentication-d0485122">sample</a> explains it, it doesn't make it really easy when you need to do the whole OAuth 1.0 request signing shinangians.</p>
+
+<p>This class attempts to solve that by providing a WinJS.Promise based API that allows chaining, errors etc to propogate. It's simple to use, and I would recommend looking deeper into the tests to use it. However, simple usage:</p>
+
+<pre><code>var url = "http://api.twitter.com/1/statuses/update.json"  
+var request = new Codevoid.OAuth.OAuthRequest(clientInfo, url);
+
+request.data = [{ key: "status", value: "Test@Status %78 update: " + Date.now() }];
+request.send().done(function (resultData) {
+    var result = JSON.parse(resultData);
+},
+</code></pre>
+
+<p>Thats all there is too it. You get the raw response back, and you can do whatever you want.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/grork">grork</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
