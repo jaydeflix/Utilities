@@ -17,7 +17,10 @@
       <header>
         <h1>Codevoid Utilities</h1>
         <p>Stuff to help you do more stuff</p>
+
         <p class="view"><a href="https://github.com/grork/Utilities">View the Project on GitHub <small>grork/Utilities</small></a></p>
+
+
         <ul>
           <li><a href="https://github.com/grork/Utilities/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/grork/Utilities/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -25,17 +28,20 @@
         </ul>
       </header>
       <section>
-        <h1>Utilities</h1>
+        <h1>
+<a name="utilities" class="anchor" href="#utilities"><span class="octicon octicon-link"></span></a>Utilities</h1>
 
 <p>This is a set of classes designed for use in Windows 8 WWAs using the WinJS frameworks.</p>
 
 <p>There are a number of parts to this:</p>
 
-<h2>Shared Utilities</h2>
+<h2>
+<a name="shared-utilities" class="anchor" href="#shared-utilities"><span class="octicon octicon-link"></span></a>Shared Utilities</h2>
 
 <p>These are some common utility functions that allow you to write better code across the board.</p>
 
-<h3>appassert, alert</h3>
+<h3>
+<a name="appassert-alert" class="anchor" href="#appassert-alert"><span class="octicon octicon-link"></span></a>appassert, alert</h3>
 
 <p>Because WWA's don't have an <code>alert</code> function, and instead have <code>Windows.UI.Popup.MessageBox</code>, there is a convenient replacement that looks like your mothers alert, but is async (since sync message boxes aren't possible in WWAs). Just call <code>alert</code> and all will be good.</p>
 
@@ -44,7 +50,8 @@
 
 <p>If condition is not truthy, the previously mentioned <code>alert</code> is used to show a message to the consumer. If a debugger is attached, then the debugger will immediately break at this point too.</p>
 
-<h3>Signal</h3>
+<h3>
+<a name="signal" class="anchor" href="#signal"><span class="octicon octicon-link"></span></a>Signal</h3>
 
 <p>WinJS introduces a powerful async parttern through Promises. However, sometimes, creating promises to perform &amp; share promise patterns for your own async code is hard:</p>
 
@@ -63,7 +70,165 @@ signal.complete();
 return signal.promise;
 </code></pre>
 
-<h2>OAuth Helper</h2>
+<h3>
+<a name="codevoidutilitiesderive" class="anchor" href="#codevoidutilitiesderive"><span class="octicon octicon-link"></span></a>Codevoid.Utilities.derive</h3>
+
+<p>This is a a helper for derive a class, and having access to the original base class easily.</p>
+
+<p>Example:</p>
+
+<pre><code>    var control = WinJS.Class.define(function (argA) {
+        // Base constructor!
+    });
+
+    var derived = Codevoid.Utilities.derive(control, function (argA, argB) {
+        this.base(argA);
+        // Derived constructor!
+    });
+</code></pre>
+
+<h3>
+<a name="codevoidutilitiesproperty" class="anchor" href="#codevoidutilitiesproperty"><span class="octicon octicon-link"></span></a>Codevoid.Utilities.property</h3>
+
+<p>When mixing the <code>WinJS.Utilities.eventMixin</code>, enables a simple <code>INotifyPropertyChanged</code> type contract in JS. When the event changes, an event is raised with <code>propertyNameChanged</code>, where <code>propertyName</code> is the name of the property, with the old &amp; new value available of the <code>detail</code> property.</p>
+
+<p>Example:</p>
+
+<pre><code>var object = WinJS.Class.mix(WinJS.Class.define(function () {
+}, {
+    sample: Codevoid.Utilities.property("sample", null),
+}), WinJS.Utilities.eventMixin);
+
+var instance = new object();
+
+var valueChanged = false;
+instance.addEventListener("sampleChanged", function () {
+    valueChanged = true;
+});
+
+instance.sample = Date.now();
+</code></pre>
+
+<h3>
+<a name="codevoidutilitiesaddeventlisteners" class="anchor" href="#codevoidutilitiesaddeventlisteners"><span class="octicon octicon-link"></span></a>Codevoid.Utilities.addEventListeners</h3>
+
+<p>Enables better management of DOM-style event handlers for adding &amp; removing with much simpler patters. When called, returns an object with a <code>cancel</code> method that will remove all the event handlers added.</p>
+
+<p>Example:</p>
+
+<pre><code>var cancel = Codevoid.Utilities.addEventListeners(source, {
+   custom: function () {
+        eventWasRaised = true;
+    },
+    custom2: function () {
+        event2WasRaised = true;
+    },
+});
+
+cancel.cancel(); // Cleaned up!
+</code></pre>
+
+<h2>
+<a name="ui-control-helpers" class="anchor" href="#ui-control-helpers"><span class="octicon octicon-link"></span></a>UI Control Helpers</h2>
+
+<p>There are a nubmer of core challenges with WinJS, and WWAs when trying to make a maintainable, well built application:</p>
+
+<ul>
+<li>Avoid lots of code-driven layout.</li>
+<li>Enable easy clean up of controls</li>
+</ul><p>The utilities in <code>Codevoid.Utilities.DOM</code> try to mitigate some of these issues.</p>
+
+<h3>
+<a name="easy-clean-up-of-controls" class="anchor" href="#easy-clean-up-of-controls"><span class="octicon octicon-link"></span></a>Easy clean up of controls</h3>
+
+<h4>
+<a name="disposeofcontrol--disposeofcontroltree--removechild" class="anchor" href="#disposeofcontrol--disposeofcontroltree--removechild"><span class="octicon octicon-link"></span></a>disposeOfControl / disposeOfControlTree / removeChild</h4>
+
+<p>These are a family of methods that make it easy to clean up controls when they're being removed from the DOM.</p>
+
+<p>These should be called to either clean up controls before removal, or if you want to be super lazy, when removing &amp; cleanup with <code>removeChild</code>.</p>
+
+<p>For this to work, each of the controls that needs to do disposal work in the DOM must:</p>
+
+<ul>
+<li>Implement a <code>dispose</code> method</li>
+<li>Be on a DOM element which has a <code>data-win-control</code> attribute</li>
+</ul><p>Example usage:</p>
+
+<pre><code>Codevoid.Utilities.DOM.disposeOfControlTree(domElementTree);
+</code></pre>
+
+<h4>
+<a name="avoiding-code-driven-layout" class="anchor" href="#avoiding-code-driven-layout"><span class="octicon octicon-link"></span></a>Avoiding Code Driven Layout</h4>
+
+<p>Wouldn't it be nice if you could squirrel away the markup structure in another HTML file so that you can easily reuse the markup in many parts of the application. What if you could also ensure that any scripts, or CSS required by that markup was also magically included?</p>
+
+<p>Turns out WinJS has this! It's just not easily usable -- <code>WinJS.UI.Fragments</code> and <code>WinJS.Binding.Template</code> give you all that you need, but they're a bit of a pain in the behind to use together easily.</p>
+
+<h4>
+<a name="codevoidutilitiesdomloadtemplate" class="anchor" href="#codevoidutilitiesdomloadtemplate"><span class="octicon octicon-link"></span></a>Codevoid.Utilities.DOM.loadTemplate</h4>
+
+<p>This helper will take a fragment (e.g. a HTML file), search for a specific template in that fragment, and then hand you the <code>WinJS.Binding.Template</code> to you so you can render it into the DOM.</p>
+
+<p>Example:</p>
+
+<p>HTML</p>
+
+<pre><code>&lt;html&gt;
+    &lt;body&gt;
+        &lt;div data-win-control="WinJS.Binding.Template"
+             data-templateid="sampleTemplate"&gt;
+             &lt;div&gt;Stuff!&lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+
+<p>JavaScript:</p>
+
+<pre><code>Codevoid.Utilities.DOM.loadTemplate("/Path/To/Templates.html",
+    "sampleTemplate").then(function(control) {
+    control.render(dataContext, containerDiv);
+});
+</code></pre>
+
+<p>More detailed examples included in the tests for this project.</p>
+
+<h4>
+<a name="codevoidutilitiesdommarrypartstocontrol--marryeventstocontrol" class="anchor" href="#codevoidutilitiesdommarrypartstocontrol--marryeventstocontrol"><span class="octicon octicon-link"></span></a>Codevoid.Utilities.DOM.marryPartsToControl / marryEventsToControl</h4>
+
+<p>Do you ever want to load a template, and have the different sections &amp; child controls automatically extracted so you don't have to <code>querySelector</code> all the time? What if we could attach event handlers too? These two helper methods are the answer!</p>
+
+<p>Example:</p>
+
+<p>HTML</p>
+
+<pre><code>&lt;div data-event="{ custom: handleCustom }"
+     data-part="parent"&gt;
+    &lt;div data-event="{ custom2: handleCustom2 }"
+         data-part="child"&gt;
+    &lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>JavaScript</p>
+
+<pre><code>var instance = {
+    handleCustom: function() {}
+    handleCustom2: function() {},
+};
+
+Codevoid.Utilities.DOM.marryPartsToControl(domElement, instance);
+// Now instance has 'partent', and 'child' properties now set
+// with the elements in those properties.
+
+Codevoid.Utilities.DOM.marryEventsToControl(domElement, instance);
+// If you raise custom2 DOM event in this tree, the handler on
+// instance will be raised. Same for custom.
+</code></pre>
+
+<h2>
+<a name="oauth-helper" class="anchor" href="#oauth-helper"><span class="octicon octicon-link"></span></a>OAuth Helper</h2>
 
 <p>Writing OAuth requests is a pain in the behind. While Windows 8 provides a <a href="http://msdn.microsoft.com/en-us/library/windows/apps/windows.security.authentication.web.aspx">basic</a> way to obtain the secret tokens from the web flow, it doesn't actually make it easy to sign the requests etc. While the <a href="http://code.msdn.microsoft.com/windowsapps/Web-Authentication-d0485122">sample</a> explains it, it doesn't make it really easy when you need to do the whole OAuth 1.0 request signing shinangians.</p>
 
