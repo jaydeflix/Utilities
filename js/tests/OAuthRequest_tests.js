@@ -63,14 +63,13 @@
     }
 
     function canVerifyTwitterCredentials() {
-        var url = "https://api.twitter.com/1/account/verify_credentials.json";
+        var url = "https://api.twitter.com/1.1/account/verify_credentials.json";
         var request = new Codevoid.OAuth.OAuthRequest(realClientInfo, url, "GET");
         
         stop();
         request.send().done(function (resultData) {
             var result = JSON.parse(resultData);
-            alert("put real user name in from twitter");
-            strictEqual(result.screen_name, "", "couldn't get screen name");
+            strictEqual(result.screen_name, "CodevoidTest", "couldn't get screen name");
             start();
         },
         function (theXhr) {
@@ -80,7 +79,7 @@
     }
 
     function canPostStatusToTwitter() {
-        var url = "http://api.twitter.com/1/statuses/update.json";
+        var url = "http://api.twitter.com/1.1/statuses/update.json";
         var request = new Codevoid.OAuth.OAuthRequest(realClientInfo, url);
 
         request.data = [{ key: "status", value: "Test@Status %78 update: " + Date.now() }];
@@ -103,4 +102,22 @@
     test("signatureGeneratedCorrectly", signatureGeneratedCorrectly);
     test("canVerifyTwitterCredentials", canVerifyTwitterCredentials);
     test("canPostStatusToTwitter", canPostStatusToTwitter);
+    test("canMakeGetRequestWithPayload", function canMakeGetRequestWithPayload() {
+        var url = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+        var request = new Codevoid.OAuth.OAuthRequest(realClientInfo, url, "GET");
+
+        request.data = [{ key: "count", value: 1 }];
+
+        stop();
+        request.send().done(function (resultData) {
+            var result = JSON.parse(resultData);
+            strictEqual(Array.isArray(result), true, "Result from query wasn't an array");
+            strictEqual(result.length, 1, "Only expected one tweet");
+            start();
+        },
+        function (theXhr) {
+            ok(false, "request failed");
+            start();
+        });
+    });
 })();

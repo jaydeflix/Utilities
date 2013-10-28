@@ -10,10 +10,10 @@
 
 (function( window ) {
 
-var QUnit,
-	config,
-	testId = 0,
-	fileName = (sourceFromStacktrace( 0 ) || "" ).replace(/(:\d+)+\)?/, "").replace(/.+\//, ""),
+    var QUnit,
+        config,
+        testId = 0,
+        fileName = "qunit.js";
 	toString = Object.prototype.toString,
 	hasOwn = Object.prototype.hasOwnProperty,
 	defined = {
@@ -116,7 +116,8 @@ Test.prototype = {
 
 		var running = id( "qunit-testresult" );
 
-		if ( running ) {
+		if (running) {
+		    console.log("Running: " + this.testName);
 			running.innerHTML = "Running: <br/>" + this.name;
 		}
 
@@ -334,7 +335,6 @@ QUnit = {
 			callback: callback,
 			module: config.currentModule,
 			moduleTestEnvironment: config.currentModuleTestEnviroment,
-			stack: sourceFromStacktrace( 2 )
 		});
 
 		if ( !validTest( test ) ) {
@@ -692,7 +692,7 @@ extend( QUnit, {
 				return "null";
 		}
 
-		var type = toString.call( obj ).match(/^\[object\s(.*)\]$/)[1] || "";
+		var type = Object.prototype.toString.call( obj ).match(/^\[object\s(.*)\]$/)[1] || "";
 
 		switch ( type ) {
 			case "Number":
@@ -942,6 +942,8 @@ window.onerror = function( message, file, line ) {
 			QUnit.pushFailure( message, file + ":" + line );
 		});
 	}
+
+	return true;
 };
 
 function done() {
@@ -1495,7 +1497,7 @@ QUnit.jsDump = (function() {
 					type = "node";
 				} else if (
 					// native arrays
-					toString.call( obj ) === "[object Array]" ||
+					Array.isArray( obj ) ||
 					// NodeList objects
 					( typeof obj.length === "number" && typeof obj.item !== "undefined" && ( obj.length ? obj.item(0) === obj[0] : ( obj.item( 0 ) === null && typeof obj[0] === "undefined" ) ) )
 				) {
