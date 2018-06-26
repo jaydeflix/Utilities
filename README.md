@@ -165,7 +165,7 @@ JavaScript
     // instance will be raised. Same for custom.
     
 ## OAuth Helper ##
-Writing OAuth requests is a pain in the behind. While Windows 8 provides a [basic](http://msdn.microsoft.com/en-us/library/windows/apps/windows.security.authentication.web.aspx) way to obtain the secret tokens from the web flow, it doesn't actually make it easy to sign the requests etc. While the [sample](http://code.msdn.microsoft.com/windowsapps/Web-Authentication-d0485122) explains it, it doesn't make it really easy when you need to do the whole OAuth 1.0 request signing shenangians.
+Writing OAuth requests is a pain in the behind. While Windows 8 provides a [basic](http://msdn.microsoft.com/en-us/library/windows/apps/windows.security.authentication.web.aspx) way to obtain the secret tokens from the web flow, it doesn't actually make it easy to sign the requests etc. While the [sample](http://code.msdn.microsoft.com/windowsapps/Web-Authentication-d0485122) explains it, it doesn't make it really easy when you need to do the whole OAuth 1.0 request signing shenanigans.
 
 This class attempts to solve that by providing a WinJS.Promise based API that allows chaining, errors etc to propogate. It's simple to use, and I would recommend looking deeper into the tests to use it. However, simple usage:
 
